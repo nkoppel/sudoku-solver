@@ -8,9 +8,9 @@ fn gen_group_table() -> [u128; 27] {
     let mut out = [0; 27];
 
     for i in 0..9 {
-        out[i     ] = ROW << (i * 9);
-        out[i +  9] = COLUMN << i;
-        out[i + 18] = BOX << ((i % 3 * 3) + (i / 3 * 27));
+        out[i     ] = BOX << ((i % 3 * 3) + (i / 3 * 27));
+        out[i +  9] = ROW << (i * 9);
+        out[i + 18] = COLUMN << i;
     }
 
     out
@@ -164,8 +164,6 @@ impl Solver {
                         self.puzzle = p;
 
                         self.puzzle.boards[n as usize] &= !(1 << s);
-                        // println!("undo {} {}", s.trailing_zeros(), n + 1);
-                        // println!("{:?}", self);
                     }
                     None => return false
                 }
@@ -174,14 +172,11 @@ impl Solver {
             let p = self.puzzle.clone();
             let (sq, num) = self.guess();
 
-            // println!("{} {}", sq.trailing_zeros(), num + 1);
-            // println!("{:?}", self);
-
             if sq == 81 {
                 if self.slow_is_valid() {
+                    self.stack.clear();
                     return true;
                 }
-                // println!("{:?}", self);
             } else {
                 self.stack.push((p, sq, num));
             }
@@ -194,14 +189,6 @@ impl Solver {
 
         self.puzzle = puzzle.clone();
 
-        if !self.solve() || self.puzzle != solution {
-            println!("{:?}", puzzle);
-            println!("{:?}", self.puzzle);
-            println!("{:?}", solution);
-
-            println!("\"{}\", \"{}\"", puzzle.to_string(), solution.to_string());
-
-            panic!("Failed");
-        }
+        assert!(self.solve() && self.puzzle == solution);
     }
 }
