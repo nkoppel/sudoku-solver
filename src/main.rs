@@ -5,7 +5,7 @@ use puzzle::*;
 use solve::*;
 
 use std::fs::File;
-use std::io::{self, Lines, Read, BufRead, BufReader, stdin};
+use std::io::{Lines, Read, BufRead, BufReader, stdin};
 
 fn test_from_lines<T>(lines: Lines<T>)
     where T: BufRead
