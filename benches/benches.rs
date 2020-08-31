@@ -22,52 +22,40 @@ fn bench_from_string(b: &mut Bencher) {
 #[bench]
 fn bench_solve(b: &mut Bencher) {
     let puzzle = Puzzle::from_str(TEST_PUZZLE);
-    let groups = gen_group_table();
-    let squares = gen_square_table();
+    let mut solver = Solver::new();
 
     b.iter(|| {
-        let mut p = puzzle.clone();
-        test::black_box(&mut p).solve(&groups, &squares)
+        solver.puzzle = puzzle.clone();
+        test::black_box(&mut solver).solve()
     });
 }
 
 #[bench]
 fn bench_slow_is_valid(b: &mut Bencher) {
     let puzzle = Puzzle::from_str(TEST_PUZZLE);
-    let squares = gen_square_table();
+    let mut solver = Solver::new();
 
-    b.iter(|| test::black_box(&puzzle).slow_is_valid(&squares));
+    b.iter(|| test::black_box(&solver).slow_is_valid());
 }
 
 #[bench]
 fn bench_update(b: &mut Bencher) {
     let puzzle = Puzzle::from_str(TEST_PUZZLE);
-    let groups = gen_group_table();
-    let squares = gen_square_table();
+    let mut solver = Solver::new();
 
     b.iter(|| {
-        let mut p = puzzle.clone();
-        test::black_box(&mut p).update(&groups, &squares)
+        solver.puzzle = puzzle.clone();
+        test::black_box(&mut solver).update()
     });
 }
 
 #[bench]
 fn bench_guess(b: &mut Bencher) {
     let puzzle = Puzzle::from_str(TEST_PUZZLE);
+    let mut solver = Solver::new();
 
     b.iter(|| {
-        let mut p = puzzle.clone();
-        test::black_box(&mut p).guess()
+        solver.puzzle = puzzle.clone();
+        test::black_box(&mut solver).guess()
     });
-}
-
-#[bench]
-fn bench_get_square_options(b: &mut Bencher) {
-    let mut puzzle = Puzzle::from_str(TEST_PUZZLE);
-    let groups = gen_group_table();
-    let squares = gen_square_table();
-
-    puzzle.update(&groups, &squares);
-
-    b.iter(|| test::black_box(&puzzle).get_square_options());
 }

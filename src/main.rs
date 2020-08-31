@@ -32,7 +32,10 @@ fn solve_from_lines<T>(lines: Lines<T>)
         let line = line.unwrap();
         solver.puzzle =  Puzzle::from_str(&line);
 
-        solver.solve();
+        if !solver.solve() {
+            panic!("Unable to solve puzzle: {}", line);
+        }
+        println!("{}", solver.puzzle.to_string());
         println!("{}", solver.puzzle);
     }
 }
