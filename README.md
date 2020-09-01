@@ -1,6 +1,6 @@
 # Sudoku solver
 
-A fast sudoku solver using bitboards, using Rust's u128 type to fit 81 bits of state into one number.
+A fast bitboard sudoku solver using Rust's u128 type to fit 81 bits of state into one number.
 
 ## Usage
 
