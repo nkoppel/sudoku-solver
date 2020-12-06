@@ -1,8 +1,8 @@
 use crate::puzzle::*;
 
-const ROW: u128 = 0x1ff;
-const COLUMN: u128 = 0x1008040201008040201;
-const BOX: u128 = 0b111000000111000000111;
+const ROW: u128 = 0o777;
+const COLUMN: u128 = 0o001_001_001_001_001_001_001_001_001;
+const BOX: u128 = 0o7007007;
 
 fn gen_group_table() -> [u128; 27] {
     let mut out = [0; 27];
@@ -108,22 +108,19 @@ impl Solver {
             let mut num_solved = [0; 9];
             let mut all_solved = 0;
 
-            for i in 0..9 {
-                if (self.puzzle.boards[i] & self.puzzle.get_solved()).count_ones() < 9 {
-                    for g in &self.groups {
-                        let tmp = self.puzzle.boards[i] & g;
+            for g in &self.groups {
+                for i in 0..9 {
+                    let tmp = self.puzzle.boards[i] & g;
 
-                        if tmp.is_power_of_two() {
-                            num_solved[i] |= tmp;
-                            all_solved |= tmp;
-                        }
+                    if tmp.is_power_of_two() {
+                        num_solved[i] |= tmp;
+                        all_solved |= tmp;
                     }
                 }
             }
 
             for i in 0..9 {
-                self.puzzle.boards[i] &= !all_solved;
-                self.puzzle.boards[i] |= num_solved[i];
+                self.puzzle.boards[i] &= !all_solved | num_solved[i];
             }
 
             solved = self.puzzle.get_new_solved();

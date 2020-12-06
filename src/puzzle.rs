@@ -1,14 +1,14 @@
 pub fn print_board(b: u128) {
-    for i in 0..81 {
-        if b & (1 << i) != 0 {
-            print!("#");
-        } else {
-            print!("_");
+    for y in (0..9).rev() {
+        for x in (0..9).rev() {
+            if b & (1 << (x + y * 9)) != 0 {
+                print!("# ");
+            } else {
+                print!("_ ");
+            }
         }
 
-        if i % 9 == 8 {
-            println!();
-        }
+        println!();
     }
     println!();
 }
