@@ -30,7 +30,6 @@ pub fn quick_columns(mut board: u128) -> u128 {
 
 #[inline]
 pub fn quick_rows(mut board: u128) -> u128 {
-    let tmp = board;
     let three_column = 0o007_007_007_007_007_007_007_007_007;
     let mut twice = 0;
 
@@ -56,7 +55,6 @@ pub fn quick_rows(mut board: u128) -> u128 {
 
 #[inline]
 pub fn quick_boxes(mut board: u128) -> u128 {
-    let tmp = board;
     let three_row = 0o000_000_777_000_000_777_000_000_777;
     let res = 0o000_000_111_000_000_111_000_000_111;
     let mut twice = 0;
@@ -132,7 +130,6 @@ impl Iterator for LocIter {
 pub struct Solver {
     pub puzzle: Puzzle,
     squares: [u128; 81],
-    groups: [u128; 27],
     stack: Vec<(Puzzle, u8, u8)>
 }
 
@@ -141,7 +138,6 @@ impl Solver {
         Solver {
             puzzle: Puzzle::new(),
             squares: gen_square_table(),
-            groups: gen_group_table(),
             stack: Vec::new()
         }
     }
