@@ -4,6 +4,83 @@ const ROW: u128 = 0o777;
 const COLUMN: u128 = 0o001_001_001_001_001_001_001_001_001;
 const BOX: u128 = 0o7007007;
 
+#[inline]
+pub fn quick_columns(mut board: u128) -> u128 {
+    let mut twice = 0;
+
+    twice |= board & (board >> 27);
+    board |= board >> 27;
+
+    twice |= board & (board >> 54);
+    board |= board >> 54;
+
+    board &= 0o777_777_777;
+
+    twice |= twice >> 9;
+    twice |= twice >> 18;
+
+    twice |= board & (board >> 9);
+    board |= board >> 9;
+
+    twice |= board & (board >> 18);
+    board |= board >> 18;
+
+    board & !twice & ROW
+}
+
+#[inline]
+pub fn quick_rows(mut board: u128) -> u128 {
+    let tmp = board;
+    let three_column = 0o007_007_007_007_007_007_007_007_007;
+    let mut twice = 0;
+
+    twice |= board & (board >> 3);
+    board |= (board >> 3) & three_column;
+
+    twice |= board & (board >> 6);
+    board |= board >> 6;
+
+    board &= three_column;
+
+    twice |= twice >> 1;
+    twice |= twice >> 2;
+
+    twice |= board & (board >> 1);
+    board |= board >> 1;
+
+    twice |= board & (board >> 2);
+    board |= board >> 2;
+
+    board & !twice & COLUMN
+}
+
+#[inline]
+pub fn quick_boxes(mut board: u128) -> u128 {
+    let tmp = board;
+    let three_row = 0o000_000_777_000_000_777_000_000_777;
+    let res = 0o000_000_111_000_000_111_000_000_111;
+    let mut twice = 0;
+
+    twice |= board & (board >> 9);
+    board |= (board >> 9) & three_row;
+
+    twice |= board & (board >> 18);
+    board |= board >> 18;
+
+    board &= three_row;
+
+    twice |= (twice >> 1) & res;
+    twice |= twice >> 2;
+
+    twice |= board & (board >> 1);
+    board |= (board >> 1) & res;
+
+    twice |= board & (board >> 2);
+    board |= board >> 2;
+
+    board & !twice & res
+}
+
 fn gen_group_table() -> [u128; 27] {
     let mut out = [0; 27];
 
@@ -108,14 +185,34 @@ impl Solver {
             let mut num_solved = [0; 9];
             let mut all_solved = 0;
 
-            for g in &self.groups {
-                for i in 0..9 {
-                    let tmp = self.puzzle.boards[i] & g;
+            let old_solved = self.puzzle.get_solved();
 
-                    if tmp.is_power_of_two() {
-                        num_solved[i] |= tmp;
-                        all_solved |= tmp;
-                    }
+            for i in 0..9 {
+                let unsolved = self.puzzle.boards[i] & !old_solved;
+
+                let rows    = quick_rows(unsolved);
+                let columns = quick_columns(unsolved);
+                let boxes   = quick_boxes(unsolved);
+
+                for j in LocIter(rows) {
+                    let tmp = unsolved & (ROW << j);
+
+                    num_solved[i] |= tmp;
+                    all_solved |= tmp;
+                }
+
+                for j in LocIter(columns) {
+                    let tmp = unsolved & (COLUMN << j);
+
+                    num_solved[i] |= tmp;
+                    all_solved |= tmp;
+                }
+
+                for j in LocIter(boxes) {
+                    let tmp = unsolved & (BOX << j);
+
+                    num_solved[i] |= tmp;
+                    all_solved |= tmp;
                 }
             }
 

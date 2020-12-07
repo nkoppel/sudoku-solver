@@ -35,8 +35,8 @@ fn solve_from_lines<T>(lines: Lines<T>)
         if !solver.solve() {
             panic!("Unable to solve puzzle: {}", line);
         }
-        println!("{}", solver.puzzle.to_string());
-        println!("{}", solver.puzzle);
+        // println!("{}", solver.puzzle.to_string());
+        // println!("{}", solver.puzzle);
     }
 }
 
@@ -50,4 +50,17 @@ fn main() {
     let reader = BufReader::new(file).lines();
 
     solve_from_lines(reader);
+
+    // let mut solver = Solver::new();
+    // solver.puzzle = Puzzle::from_str("000000002001000700030050090000006040003040800040509000090060030002000100700003000");
+
+    // println!("{:?}", solver.puzzle);
+
+    // println!("{}", solver.solve());
+
+    // println!("{:?}", solver.puzzle);
+    
+    // let test = 0x186c10030b8300000160f;
+
+    // print_board(quick_boxes(test));
 }
