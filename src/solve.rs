@@ -1,8 +1,8 @@
-use crate::puzzle::*;
+use super::puzzle::*;
 
-const ROW: u128 = 0o777;
-const COLUMN: u128 = 0o001_001_001_001_001_001_001_001_001;
-const BOX: u128 = 0o7007007;
+pub const ROW: u128 = 0o777;
+pub const COLUMN: u128 = 0o001_001_001_001_001_001_001_001_001;
+pub const BOX: u128 = 0o7007007;
 
 #[inline]
 pub fn quick_columns(mut board: u128) -> u128 {
@@ -79,7 +79,69 @@ pub fn quick_boxes(mut board: u128) -> u128 {
     board & !twice & res
 }
 
-fn gen_group_table() -> [u128; 27] {
+pub fn quick_horiz_triads(mut board: u128) -> (u128, u128) {
+    let three_column = 0o111_111_111_111_111_111_111_111_111;
+    let res = 0o000_000_111_000_000_111_000_000_111;
+    let mut twice = 0;
+
+    board |= (board >> 1) & three_column;
+    board |= board >> 2;
+
+    board &= three_column;
+
+    let mut board2 = board;
+
+    twice |= board2 & (board2 >> 9);
+    board2 |= (board2 >> 9) & res;
+
+    twice |= board2 & (board2 >> 18);
+    board2 |= board2 >> 18;
+
+    board2 &= !twice & res;
+
+    twice = 0;
+
+    twice |= board & board >> 3;
+    board |= (board >> 3);
+
+    twice |= board & board >> 6;
+    board |= (board >> 6);
+
+    (board & COLUMN & !twice, board2)
+}
+
+pub fn quick_vert_triads(mut board: u128) -> (u128, u128) {
+    let three_row = 0o000_000_777_000_000_777_000_000_777;
+    let res = 0o000_000_111_000_000_111_000_000_111;
+    let mut twice = 0;
+
+    board |= (board >> 9) & three_row;
+    board |= board >> 18;
+
+    board &= three_row;
+
+    let mut board2 = board;
+
+    twice |= board2 & (board2 >> 1);
+    board2 |= (board2 >> 1) & res;
+
+    twice |= board2 & (board2 >> 2);
+    board2 |= board2 >> 2;
+
+    board2 &= !twice & res;
+
+    twice = 0;
+
+    twice |= board & board >> 27;
+    board |= (board >> 27);
+
+    twice |= board & board >> 54;
+    board |= (board >> 54);
+
+    (board & ROW & !twice, board2)
+}
+
+pub fn gen_group_table() -> [u128; 27] {
     let mut out = [0; 27];
 
     for i in 0..9 {
@@ -130,6 +192,7 @@ impl Iterator for LocIter {
 pub struct Solver {
     pub puzzle: Puzzle,
     squares: [u128; 81],
+    groups: [u128; 27],
     stack: Vec<(Puzzle, u8, u8)>
 }
 
@@ -138,6 +201,7 @@ impl Solver {
         Solver {
             puzzle: Puzzle::new(),
             squares: gen_square_table(),
+            groups: gen_group_table(),
             stack: Vec::new()
         }
     }
@@ -184,27 +248,32 @@ impl Solver {
             let old_solved = self.puzzle.get_solved();
 
             for i in 0..9 {
+                // for g in &self.groups {
+                    // let tmp = self.puzzle.boards[i] & g;
+
+                    // if tmp.is_power_of_two() {
+                        // num_solved[i] |= tmp;
+                        // all_solved |= tmp;
+                    // }
+                // }
+
                 let unsolved = self.puzzle.boards[i] & !old_solved;
 
-                let rows    = quick_rows(unsolved);
-                let columns = quick_columns(unsolved);
-                let boxes   = quick_boxes(unsolved);
-
-                for j in LocIter(rows) {
+                for j in LocIter(quick_rows(unsolved)) {
                     let tmp = unsolved & (ROW << j);
 
                     num_solved[i] |= tmp;
                     all_solved |= tmp;
                 }
 
-                for j in LocIter(columns) {
+                for j in LocIter(quick_columns(unsolved)) {
                     let tmp = unsolved & (COLUMN << j);
 
                     num_solved[i] |= tmp;
                     all_solved |= tmp;
                 }
 
-                for j in LocIter(boxes) {
+                for j in LocIter(quick_boxes(unsolved)) {
                     let tmp = unsolved & (BOX << j);
 
                     num_solved[i] |= tmp;

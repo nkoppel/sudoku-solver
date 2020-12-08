@@ -41,15 +41,15 @@ fn solve_from_lines<T>(lines: Lines<T>)
 }
 
 fn main() {
-    let file: Box<dyn Read> =
-        match std::env::args().collect::<Vec<_>>().get(1) {
-            Some(file) => Box::new(File::open(file).expect("File not found")),
-            None => Box::new(stdin())
-        };
+    // let file: Box<dyn Read> =
+        // match std::env::args().collect::<Vec<_>>().get(1) {
+            // Some(file) => Box::new(File::open(file).expect("File not found")),
+            // None => Box::new(stdin())
+        // };
 
-    let reader = BufReader::new(file).lines();
+    // let reader = BufReader::new(file).lines();
 
-    solve_from_lines(reader);
+    // solve_from_lines(reader);
 
     // let mut solver = Solver::new();
     // solver.puzzle = Puzzle::from_str("000000002001000700030050090000006040003040800040509000090060030002000100700003000");
@@ -60,7 +60,12 @@ fn main() {
 
     // println!("{:?}", solver.puzzle);
     
-    // let test = 0x186c10030b8300000160f;
+    let test = 0x186c10030b8300000160f;
 
-    // print_board(quick_boxes(test));
+    print_board(test);
+
+    let (tmp1, tmp2) = quick_horiz_triads(test);
+
+    print_board(tmp1);
+    print_board(tmp2);
 }
