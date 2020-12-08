@@ -60,11 +60,13 @@ fn main() {
 
     // println!("{:?}", solver.puzzle);
     
-    let test = 0x186c10030b8300000160f;
+    let testh = 0o770_770_007_777_777_007_770_770_777;
+    let testv = 0o667_667_667_667_667_667_171_171_171;
 
-    print_board(test);
+    print_board(testv);
+    print_board(testh);
 
-    let (tmp1, tmp2) = quick_horiz_triads(test);
+    let (tmp1, tmp2) = quick_horiz_triads(testh);
 
     print_board(tmp1);
     print_board(tmp2);

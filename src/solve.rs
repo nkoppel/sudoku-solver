@@ -4,6 +4,8 @@ pub const ROW: u128 = 0o777;
 pub const COLUMN: u128 = 0o001_001_001_001_001_001_001_001_001;
 pub const BOX: u128 = 0o7007007;
 
+const BOX_LOCS: u128 = 0o000_000_111_000_000_111_000_000_111;
+
 #[inline]
 pub fn quick_columns(mut board: u128) -> u128 {
     let mut twice = 0;
@@ -56,7 +58,6 @@ pub fn quick_rows(mut board: u128) -> u128 {
 #[inline]
 pub fn quick_boxes(mut board: u128) -> u128 {
     let three_row = 0o000_000_777_000_000_777_000_000_777;
-    let res = 0o000_000_111_000_000_111_000_000_111;
     let mut twice = 0;
 
     twice |= board & (board >> 9);
@@ -67,21 +68,20 @@ pub fn quick_boxes(mut board: u128) -> u128 {
 
     board &= three_row;
 
-    twice |= (twice >> 1) & res;
+    twice |= (twice >> 1) & BOX_LOCS;
     twice |= twice >> 2;
 
     twice |= board & (board >> 1);
-    board |= (board >> 1) & res;
+    board |= (board >> 1) & BOX_LOCS;
 
     twice |= board & (board >> 2);
     board |= board >> 2;
 
-    board & !twice & res
+    board & !twice & BOX_LOCS
 }
 
 pub fn quick_horiz_triads(mut board: u128) -> (u128, u128) {
     let three_column = 0o111_111_111_111_111_111_111_111_111;
-    let res = 0o000_000_111_000_000_111_000_000_111;
     let mut twice = 0;
 
     board |= (board >> 1) & three_column;
@@ -92,19 +92,19 @@ pub fn quick_horiz_triads(mut board: u128) -> (u128, u128) {
     let mut board2 = board;
 
     twice |= board2 & (board2 >> 9);
-    board2 |= (board2 >> 9) & res;
+    board2 |= (board2 >> 9) & BOX_LOCS;
 
     twice |= board2 & (board2 >> 18);
     board2 |= board2 >> 18;
 
-    board2 &= !twice & res;
+    board2 &= !twice & BOX_LOCS;
 
     twice = 0;
 
-    twice |= board & board >> 3;
+    twice |= board & (board >> 3) & COLUMN;
     board |= (board >> 3);
 
-    twice |= board & board >> 6;
+    twice |= board & (board >> 6) & COLUMN;
     board |= (board >> 6);
 
     (board & COLUMN & !twice, board2)
@@ -112,7 +112,6 @@ pub fn quick_horiz_triads(mut board: u128) -> (u128, u128) {
 
 pub fn quick_vert_triads(mut board: u128) -> (u128, u128) {
     let three_row = 0o000_000_777_000_000_777_000_000_777;
-    let res = 0o000_000_111_000_000_111_000_000_111;
     let mut twice = 0;
 
     board |= (board >> 9) & three_row;
@@ -123,12 +122,12 @@ pub fn quick_vert_triads(mut board: u128) -> (u128, u128) {
     let mut board2 = board;
 
     twice |= board2 & (board2 >> 1);
-    board2 |= (board2 >> 1) & res;
+    board2 |= (board2 >> 1) & BOX_LOCS;
 
     twice |= board2 & (board2 >> 2);
     board2 |= board2 >> 2;
 
-    board2 &= !twice & res;
+    board2 &= !twice & BOX_LOCS;
 
     twice = 0;
 

@@ -109,11 +109,12 @@ fn bench_groups_slow(b: &mut Bencher) {
 
 #[bench]
 fn bench_quick_triads(b: &mut Bencher) {
-    let test = 0x186c10030b8300000160f;
+    let testh = 0o770_770_007_777_777_007_770_770_777;
+    let testv = 0o667_667_667_667_667_667_171_171_171;
 
     b.iter(|| (
-        quick_vert_triads(test::black_box(test)),
-        quick_horiz_triads(test::black_box(test)),
+        quick_horiz_triads(test::black_box(testh)),
+        quick_vert_triads(test::black_box(testv)),
     ))
 }
 
